@@ -12,19 +12,19 @@ const Footer: React.FC = () => {
         {
           key: 'Spark',
           title: 'Spark',
-          href: 'https://pro.ant.design',
+          href: 'https://hydrox.ai',
           blankTarget: true,
         },
         {
           key: 'github',
           title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
+          href: 'https://github.com/hydroxai',
           blankTarget: true,
         },
         {
-          key: 'Ant Design',
-          title: 'Ant Design',
-          href: 'https://ant.design',
+          key: 'Hydrox AI',
+          title: 'Hydrox AI',
+          href: 'https://hydrox.ai',
           blankTarget: true,
         },
       ]}

@@ -29,17 +29,17 @@ export default [
     component: './Welcome',
   },
   {
-    path: '/admin',
+    path: '/role',
     name: 'admin',
     icon: 'crown',
     access: 'canAdmin',
-    component: './Admin',
+    component: './Role',
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    name: 'newRole',
+    path: '/role/new_role',
+    component: './Role/NewRole',
+    hideInMenu: true,
   },
   {
     path: '/',
