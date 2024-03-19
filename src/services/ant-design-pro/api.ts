@@ -2,11 +2,10 @@
 /* eslint-disable */
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 
-const API_PREFIX = process.env.API_PREFIX || ''
-console.log('API_PREFIX', API_PREFIX)
+const API_PREFIX = 'https://stg-social.hydrox.ai';
+console.log('API_PREFIX', API_PREFIX);
 
 export async function request<T>(url: string, options?: any): Promise<AxiosResponse<T>> {
-
   return originalRequest(url.startsWith('/') ? API_PREFIX + url : url, options);
 }
 
