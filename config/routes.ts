@@ -42,6 +42,12 @@ export default [
     hideInMenu: true,
   },
   {
+    name: 'edit',
+    path: '/role/edit/:id',
+    component: './Role/Edit',
+    hideInMenu: true,
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },

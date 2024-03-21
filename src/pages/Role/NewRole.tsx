@@ -4,7 +4,7 @@ import { history, useIntl } from '@umijs/max';
 import { Alert, Button, Card, Typography } from 'antd';
 import React from 'react';
 import { Space, Table, Tag } from 'antd';
-
+import RoleInfoFrom from '@/components/RoleInfoForm';
 const { Column, ColumnGroup } = Table;
 
 interface DataType {
@@ -28,8 +28,8 @@ const NewRole: React.FC = () => {
   return (
     <PageContainer
       content={intl.formatMessage({
-        id: '现有角色的性格，人物背景，年龄, 关系值等信息',
-        defaultMessage: '现有角色的性格，人物背景，年龄, 关系值等信息',
+        id: '请创建角色详细信息',
+        defaultMessage: '请创建角色详细信息',
       })}
        extra={[
          <Button key="1" type="primary" onClick={() => {
@@ -39,27 +39,8 @@ const NewRole: React.FC = () => {
     </Button>,
   ]}
     >
-      <Card
-      >
-   <Table dataSource={data}>
-    <Column title="Name" dataIndex="name" key="name" width={'75%'} />
-    <Column
-      title="Action"
-      key="action"
-            render={(_: any, record: DataType) => (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <Button>操作日志</Button>
-                 <Button>删除</Button>
-                <Button type='primary'>编辑</Button>
-              </div>
-              
-      )}
-    />
-  </Table>
+      <Card>
+        <RoleInfoFrom />
       </Card>
     </PageContainer>
   );

@@ -13,7 +13,7 @@ export async function request<T>(url: string, options?: any): Promise<AxiosRespo
 export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
+  }>('/api/admin/user/info', {
     method: 'GET',
     ...(options || {}),
   });
@@ -95,6 +95,44 @@ export async function removeRule(options?: { [key: string]: any }) {
     method: 'POST',
     data: {
       method: 'delete',
+      ...(options || {}),
+    }
+  });
+}
+
+
+export async function getRoleList(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/list', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    }
+  });
+}
+
+export async function getRoleDetailById(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/info', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    }
+  });
+}
+
+
+export async function getVoiceList(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/voice', {
+    method: 'GET',
+    data: {
+      ...(options || {}),
+    }
+  });
+}
+
+export async function saveRoleDetail(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/save', {
+    method: 'POST',
+    data: {
       ...(options || {}),
     }
   });

@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": false,
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
     "sourceMap": true,
     "baseUrl": "./",
@@ -19,5 +20,5 @@
       "@@test/*": ["./src/.umi-test/*"]
     }
   },
-  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx","./src/*.tsx"]
 }

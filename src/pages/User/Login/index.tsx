@@ -103,22 +103,18 @@ const Login: React.FC = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async () => {
-    // const userInfo = await initialState?.fetchUserInfo?.();
-    // if (userInfo) {
+    const userInfo = await initialState?.fetchUserInfo?.();
+    if (userInfo){
       flushSync(() => {
         setInitialState((s) => ({
           ...s,
-          // currentUser: userInfo,
-          currentUser: {
-            name: 'yang',
-            avatar: 'https://avatars.githubusercontent.com/u/94534613?v=4',
-            userid: '00000001',
-            email: '',
-            access:'admin'
-          },
+          currentUser:  {
+             ...userInfo,         
+             avatar: 'https://avatars.githubusercontent.com/u/94534613?v=4',
+           }
         }));
       });
-    // }
+    }
   };
 
   const handleSubmit = async (values: API.LoginParams) => {
@@ -130,6 +126,7 @@ const Login: React.FC = () => {
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
+        localStorage.setItem('token', msg?.token);
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
@@ -195,13 +192,6 @@ const Login: React.FC = () => {
                   defaultMessage: '账户密码登录',
                 }),
               },
-              // {
-              //   key: 'mobile',
-              //   label: intl.formatMessage({
-              //     id: 'pages.login.phoneLogin.tab',
-              //     defaultMessage: '手机号登录',
-              //   }),
-              // },
             ]}
           />
 

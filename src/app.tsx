@@ -25,6 +25,7 @@ export async function getInitialState(): Promise<{
       const msg = await queryCurrentUser({
         skipErrorHandler: true,
       });
+      console.log('msg',msg)
       return msg.data;
     } catch (error) {
       history.push(loginPath);
@@ -37,7 +38,10 @@ export async function getInitialState(): Promise<{
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
-      currentUser,
+      currentUser: {
+        ...currentUser,
+        avatar: 'https://avatars.githubusercontent.com/u/94534613?v=4',
+      },
       settings: defaultSettings as Partial<LayoutSettings>,
     };
   }
