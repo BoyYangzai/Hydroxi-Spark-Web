@@ -55,9 +55,9 @@ const [previewOpen, setPreviewOpen] = useState(false);
         file.url = await getBase64(file.originFileObj as FileType);
     }
     return file;
-}));
+    }));
     setFileList(updatedFile)
-    setRoleShowsInfos(updatedFile.map((item) => item.url!))
+    setRoleShowsInfos(updatedFile.map((item) => item.url!)??[])
   }
   
   useEffect(() => {

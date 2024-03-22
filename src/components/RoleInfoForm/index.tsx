@@ -129,7 +129,7 @@ const RoleInfoFrom = ({ roleData }) => {
 
 
    const handleFormChange = (e) => {
-      if (e.target.id === 'maxRelationship') {
+      if (e.target.id === 'maxIntimacyLevel') {
         setMaxRelationship(e.target.value)
       }
       
@@ -139,9 +139,9 @@ const RoleInfoFrom = ({ roleData }) => {
           ...roleShowsInfos,
         ]
         newList[index - 1] = {
-          intimacyInfoLevel: index,
+          intimacyInfoLevel: Number(index),
           relationPrompt: e.target.value,
-          roleShows: roleShowsInfos[index - 1]?.roleShows
+          roleShows: roleShowsInfos[index - 1]?.roleShows??[]
         }
         setRoleShowsInfos(newList)
       }
@@ -151,10 +151,10 @@ const RoleInfoFrom = ({ roleData }) => {
       useMode?: string;
   }>
     onFinish={async (values) => {
-
       try {
         const postData = {
-        roleId: roleData?.roleId,
+          roleId: roleData?.roleId,
+         avatar:imageUrl,
         ...values,
         RoleShowInfos:roleShowsInfos
       }
@@ -240,11 +240,13 @@ const RoleInfoFrom = ({ roleData }) => {
       required />   <ProFormTextArea
       name="scene"
       label="Scene"
-      required />
+      required
+    />
     <ProFormTextArea
       name="informationShow"
       label="InformationShow"
-      required />
+      required
+    />
      <ProFormSelect
     name="voice"
       label={`Voice\n（创建后不可编辑）`}
