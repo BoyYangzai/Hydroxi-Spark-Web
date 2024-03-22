@@ -1,20 +1,10 @@
 import type { ProFormInstance } from '@ant-design/pro-components';
 import {
   ProForm,
-  ProFormCascader,
-  ProFormDatePicker,
-  ProFormDateRangePicker,
   ProFormDigit,
-  ProFormDigitRange,
-  ProFormGroup,
-  ProFormList,
-  ProFormMoney,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  ProFormTreeSelect,
-  ProFormUploadButton,
-  ProFormUploadDragger,
 } from '@ant-design/pro-components';
 import { Avatar, TreeSelect, Upload, message } from 'antd';
 import moment from 'dayjs';

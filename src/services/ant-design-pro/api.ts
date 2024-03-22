@@ -137,3 +137,22 @@ export async function saveRoleDetail(options?: { [key: string]: any }) {
     }
   });
 }
+
+export async function deleteRoleById(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/delete', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    }
+  });
+}
+
+
+export async function getLogByRoleId(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/role/log', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    }
+  });
+}

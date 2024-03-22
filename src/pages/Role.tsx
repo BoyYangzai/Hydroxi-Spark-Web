@@ -1,10 +1,10 @@
 import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
-import { Alert, Button, Card, Pagination, Typography } from 'antd';
-import React, { useEffect } from 'react';
+import { Alert, Button, Card, Modal, Pagination, Typography, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { Space, Table, Tag } from 'antd';
-import { getRoleList } from '@/services/ant-design-pro/api';
+import { deleteRoleById, getLogByRoleId, getRoleList } from '@/services/ant-design-pro/api';
 
 const { Column, ColumnGroup } = Table;
 
@@ -13,35 +13,62 @@ interface DataType {
   roleId: number;
 }
 
-const data: DataType[] = [
-  {
-    name: 'Brown',
-  },
-  {
-    name: 'Green',
-  },
-  {
-    name: 'Black',
-  },
-];
-
 const Admin: React.FC = () => {
   const intl = useIntl();
 
-  const [total, setTotal] = React.useState(0);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [mainTotal, setMainTotal] = React.useState(0);
+  const [mainTableCurrentPage, setMainTableCurrentPage] = React.useState(1);
   const [roleList, setRoleList] = React.useState<DataType[]>([]);
 
   const fetchData = async () => {
-    const { data } = await getRoleList({ current: currentPage, pageSize: 10 });
-    setTotal(data.total);
+    const { data } = await getRoleList({ offset: mainTableCurrentPage, limit: 10 });
+    setMainTotal(data.total);
     setRoleList(data.roles);
   }
 
   useEffect(() => {
     fetchData();
-  }, [currentPage])
+  }, [mainTableCurrentPage])
   
+
+  // Log Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [roleLogSelected, setRoleLogSelected] = useState<DataType | null>(null);
+  const [logModalData,setLogModalData] = useState<
+        {
+        operateType: string,
+        operatorName: string,
+        updatedTime:string,
+    }[]>([])
+  const [logTotal, setLogTotal] = React.useState(0);
+  const [logTableCurrentPage, setLogTableCurrentPage] = React.useState(1);
+  const fetchLogData = async (roleId?: number) => {
+    if (!roleId) return;
+    const {data} = await getLogByRoleId({ roleId, offset: logTableCurrentPage, limit: 10 })
+    setLogTotal(data.total) 
+    setLogModalData(data.logs)
+  }
+  const showModal = async (roleId:number,roleName:string) => {
+    setIsModalOpen(true);
+    setRoleLogSelected({
+      roleId,
+      roleName
+    })
+    await fetchLogData(roleId)
+  };
+
+  useEffect(() => {
+     fetchLogData(roleLogSelected?.roleId)
+  }, [logTableCurrentPage])
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+    setLogTableCurrentPage(1)
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   return (
     <PageContainer
       content={intl.formatMessage({
@@ -58,15 +85,38 @@ const Admin: React.FC = () => {
     >
       <Card
       >
+        <Modal title={`${roleLogSelected?.roleName} 操作日志`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} 
+          footer={
+           (_, { OkBtn }) => (
+                <>
+                  <OkBtn />
+                </>
+              )
+        }
+        >
+         <Table dataSource={logModalData} pagination={{
+          total: logTotal,
+          current: logTableCurrentPage,
+            onChange: (page) => {
+            console.log('page',page)
+            setLogTableCurrentPage(page);
+            }
+          }}>
+    <Column title="操作类型" dataIndex="operateType" key="operateType" width={'5%'} />
+    <Column title="操作者" dataIndex="operatorName" key="operatorName" width={'5%'} />
+    <Column title="操作时间" dataIndex="updatedTime" key="updatedTime" width={'5%'} />
+          </Table>
+      </Modal>
     <Table dataSource={roleList} pagination={{
-          total,
-          current: currentPage,
+          total: mainTotal,
+          current: mainTableCurrentPage,
           onChange: (page) => {
-            setCurrentPage(page);
+            setMainTableCurrentPage(page);
           }
         }}>
     <Column title="ID" dataIndex="roleId" key="id" width={'5%'} />
     <Column title="Name" dataIndex="roleName" key="roleName" width={'70%'} />
+    
     <Column
       title="Action"
       key="action"
@@ -76,8 +126,31 @@ const Admin: React.FC = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}>
-                <Button>操作日志</Button>
-                 <Button>删除</Button>
+                <Button onClick={() => {
+                  showModal(record.roleId,record.roleName)
+                }}>操作日志</Button>
+                <Button onClick={() => {
+                  Modal.confirm({
+                    title: '确认删除该角色吗',
+                    content:   <div>
+                      {
+                      `roleId：${record.roleId} --- roleName：${record.roleName} `
+                      }
+                      <div>
+                         角色的所有数据将会被删除，且无法找回
+                      </div>
+                    </div>,
+                    onOk:async () => {
+                      try {
+                        await deleteRoleById({ roleId: record.roleId })
+                        message.success('删除角色成功')
+                        fetchData()
+                      } catch (error) {
+                        message.error('删除角色失败')
+                      }
+                    }
+                  })
+                 }}>删除</Button>
                 <Button type='primary' onClick={() => {
                   history.push(`/role/edit/${record.roleId}`)
                 }}>编辑</Button>
