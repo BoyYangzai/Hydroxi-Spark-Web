@@ -1,4 +1,4 @@
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
 import { Alert, Button, Card, Modal, Pagination, Typography, message } from 'antd';
@@ -39,9 +39,9 @@ const Admin: React.FC = () => {
         operateType: string,
         operatorName: string,
         updatedTime:string,
-    }[]>([])
+    }[]|null>(null)
   const [logTotal, setLogTotal] = React.useState(0);
-  const [logTableCurrentPage, setLogTableCurrentPage] = React.useState(1);
+  const [logTableCurrentPage, setLogTableCurrentPage] = React.useState(0);
   const fetchLogData = async (roleId?: number) => {
     if (!roleId) return;
     const {data} = await getLogByRoleId({ roleId, offset: logTableCurrentPage, limit: 10 })
@@ -61,13 +61,21 @@ const Admin: React.FC = () => {
      fetchLogData(roleLogSelected?.roleId)
   }, [logTableCurrentPage])
 
+
+  const clearState = () => {
+    setIsModalOpen(false);
+    setLogTableCurrentPage(0)
+    setLogTotal(0)
+    setLogModalData(null)
+  }
   const handleOk = () => {
     setIsModalOpen(false);
-    setLogTableCurrentPage(1)
+    clearState()
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    clearState()
   };
   return (
     <PageContainer
@@ -82,10 +90,9 @@ const Admin: React.FC = () => {
            新增角色
     </Button>,
   ]}
-    >
-      <Card
-      >
-        <Modal title={`${roleLogSelected?.roleName} 操作日志`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} 
+>
+<Card>
+   <Modal title={`${roleLogSelected?.roleName} 操作日志`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} 
           footer={
            (_, { OkBtn }) => (
                 <>
@@ -94,20 +101,51 @@ const Admin: React.FC = () => {
               )
         }
         >
-         <Table dataSource={logModalData} pagination={{
+      <Table 
+          size='small'
+         dataSource={logModalData} 
+         pagination={{
           total: logTotal,
           current: logTableCurrentPage,
-            onChange: (page) => {
-            console.log('page',page)
-            setLogTableCurrentPage(page);
+           onChange: (page) => {
+            setLogTableCurrentPage((page-1)*10);
             }
           }}>
-    <Column title="操作类型" dataIndex="operateType" key="operateType" width={'5%'} />
-    <Column title="操作者" dataIndex="operatorName" key="operatorName" width={'5%'} />
-    <Column title="操作时间" dataIndex="updatedTime" key="updatedTime" width={'5%'} />
+            <Column title="操作类型" key="operateType" width={'30%'} render={
+              (_, { operateType }: {
+                operateType: string
+              }) => (
+                <span style={{
+                  color: operateType === '删除角色' ? 'red' : undefined,
+                  height:'100%'
+                }}>{ operateType}</span>
+              )
+             }/>
+            <Column title="操作者"  key="operatorName" width={'20%'}
+              render={(_, record: {
+                operateType: string
+                operatorName: string
+              }) => (
+                <span style={{
+                  color: record?.operateType === '删除角色' ? 'red' : undefined,
+                  height:'100%'
+                }}>{record?.operatorName}</span>
+              )}
+            />
+            <Column title="操作时间" key="updatedTime" width={'50%'}
+              render={(_,  record: {
+                operateType: string
+                updatedTime: string
+              }) => (
+                <span style={{
+                  color: record?.operateType === '删除角色' ? 'red' : undefined,
+                  height:'100%'
+                }}>{record?.updatedTime}</span>
+              )}
+            />
           </Table>
-      </Modal>
-    <Table dataSource={roleList} pagination={{
+  </Modal>
+  <Table dataSource={roleList} pagination={{
           total: mainTotal,
           current: mainTableCurrentPage,
           onChange: (page) => {
@@ -115,8 +153,22 @@ const Admin: React.FC = () => {
           }
         }}>
     <Column title="ID" dataIndex="roleId" key="id" width={'5%'} />
-    <Column title="Name" dataIndex="roleName" key="roleName" width={'70%'} />
-    
+    <Column title="Name" dataIndex="roleName" key="roleName" width={'60%'} />
+    <Column title="Status" key="isDelete" width={'10%'}
+            render={(text, record: DataType) => (
+              !record?.isDelete ?
+                (
+                  <Tag icon={<CheckCircleOutlined />} color="success">
+                 Active
+                   </Tag>
+                ) : (
+                  <Tag icon={<CloseCircleOutlined />} color="error">
+                    Inactive
+                  </Tag>
+                  
+                )
+    )}
+    />
     <Column
       title="Action"
       key="action"
@@ -144,7 +196,6 @@ const Admin: React.FC = () => {
                       try {
                         await deleteRoleById({ roleId: record.roleId })
                         message.success('删除角色成功')
-                        fetchData()
                       } catch (error) {
                         message.error('删除角色失败')
                       }
