@@ -50,13 +50,7 @@ const beforeUpload = (file: FileType) => {
 };
 
 
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+const GenderOptions = ['男', '女', '未知'];
 
 const RoleInfoFrom = ({ roleData }) => {
   const formRef = useRef<
@@ -186,16 +180,24 @@ const RoleInfoFrom = ({ roleData }) => {
           label="Name"
           tooltip="最长为 24 位"
           placeholder="请输入 Name"
-        rules={[{ required: true, message: '这是必填项' }]}
+          rules={[{ required: true, message: '这是必填项' }]}
         />
    
-         <ProFormText
-          width="md"
-          name="gender"
-          label="Gender"
-          required
-          placeholder="请输入 Gender"
-    />
+    <ProFormSelect
+      width={340}
+    name="gender"
+    label={`Gender`}
+      options={GenderOptions.map((item) => {
+        return {
+          label: item,
+          value: item
+        }
+      }
+      )
+    }
+    placeholder="Please select a Gender"
+    rules={[{ required: true, message: 'Please select your country!' }]}
+  />
      <ProFormDigit
       name="age"
       label="Age"
@@ -242,6 +244,16 @@ const RoleInfoFrom = ({ roleData }) => {
       name="scene"
       label="Scene"
       required
+    />
+    <ProFormTextArea
+      name="costume"
+      label="Costume"
+      required
+      rules={[{
+        // length>0
+        required: true,
+        message: 'Please input your Costume!',
+      }]}
     />
     <ProFormTextArea
       name="informationShow"
