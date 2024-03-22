@@ -121,7 +121,7 @@ const RoleInfoFrom = ({ roleData }) => {
     setRoleShowsInfos(roleData?.roleShowInfos ?? [])
     setMaxRelationship(roleData?.maxIntimacyLevel)
   }, [roleData])
-
+  console.log(roleShowsInfos,'roleShowsInfos')
 
    const handleFormChange = (e) => {
       if (e.target.id === 'maxIntimacyLevel') {
@@ -204,13 +204,21 @@ const RoleInfoFrom = ({ roleData }) => {
       width="md"
       required />
     <ProForm.Item  label='Avatar' required>
-        <Upload
+    <Upload
         name="avatar"
         listType='picture-circle'
         className="avatar-uploader"
         showUploadList={false}
         beforeUpload={beforeUpload}
         onChange={handleAvatarUploadChange}
+        customRequest={async (option: any) => {
+          try {
+            option.onSuccess()
+          } catch (error) {
+            option.onError(error)
+          }
+          }
+        }
       >
         {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
       </Upload>
@@ -292,7 +300,7 @@ const RoleInfoFrom = ({ roleData }) => {
             ]
           newList[index] = {
             intimacyInfoLevel: index + 1,
-            relationPrompt: fileSrtList[0],
+            relationPrompt: roleShowsInfos[index]?.relationPrompt??'',
             roleShows: fileSrtList
           }
           setRoleShowsInfos(newList)
