@@ -62,7 +62,7 @@ const [previewOpen, setPreviewOpen] = useState(false);
   
   useEffect(() => {
     //@ts-ignore
-    setFileList(roleShowInfo?.roleShows.map((item) => {
+    setFileList(roleShowInfo?.roleShows?.map((item) => {
       return {
         uid: item,
         name: item,

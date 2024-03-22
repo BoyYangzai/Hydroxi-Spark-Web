@@ -124,7 +124,8 @@ const RoleInfoFrom = ({ roleData }) => {
       }, {})
     })
     getAllVoice()
-    setRoleShowsInfos(roleData?.roleShowInfos??[])
+    setRoleShowsInfos(roleData?.roleShowInfos ?? [])
+    setMaxRelationship(roleData?.maxIntimacyLevel)
   }, [roleData])
 
 
