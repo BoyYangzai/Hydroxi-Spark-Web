@@ -11,24 +11,25 @@ const { Column, ColumnGroup } = Table;
 interface DataType {
   roleName: string;
   roleId: number;
+  isDelete: 0|1
 }
 
 const Admin: React.FC = () => {
   const intl = useIntl();
 
   const [mainTotal, setMainTotal] = React.useState(0);
-  const [mainTableCurrentPage, setMainTableCurrentPage] = React.useState(1);
+  const [mainTableCurrentOffset, setMainTableCurrentOffset] = React.useState(0);
   const [roleList, setRoleList] = React.useState<DataType[]>([]);
 
   const fetchData = async () => {
-    const { data } = await getRoleList({ offset: mainTableCurrentPage, limit: 10 });
+    const { data } = await getRoleList({ offset: mainTableCurrentOffset, limit: 10 });
     setMainTotal(data.total);
     setRoleList(data.roles);
   }
 
   useEffect(() => {
     fetchData();
-  }, [mainTableCurrentPage])
+  }, [mainTableCurrentOffset])
   
 
   // Log Modal
@@ -39,12 +40,13 @@ const Admin: React.FC = () => {
         operateType: string,
         operatorName: string,
         updatedTime:string,
-    }[]|null>(null)
+    }[]>([])
   const [logTotal, setLogTotal] = React.useState(0);
-  const [logTableCurrentPage, setLogTableCurrentPage] = React.useState(0);
+  const [logTableCurrentOffset, setLogTableCurrentOffset] = React.useState(0);
   const fetchLogData = async (roleId?: number) => {
     if (!roleId) return;
-    const {data} = await getLogByRoleId({ roleId, offset: logTableCurrentPage, limit: 10 })
+    const {data} = await getLogByRoleId({ roleId, offset: logTableCurrentOffset, limit: 10 })
+    console.log(data.logs,'lllll')
     setLogTotal(data.total) 
     setLogModalData(data.logs)
   }
@@ -58,15 +60,17 @@ const Admin: React.FC = () => {
   };
 
   useEffect(() => {
-     fetchLogData(roleLogSelected?.roleId)
-  }, [logTableCurrentPage])
+    if(isModalOpen){
+      fetchLogData(roleLogSelected?.roleId)
+    }
+  }, [logTableCurrentOffset,isModalOpen])
 
 
   const clearState = () => {
     setIsModalOpen(false);
-    setLogTableCurrentPage(0)
+    setLogTableCurrentOffset(0)
     setLogTotal(0)
-    setLogModalData(null)
+    setLogModalData([])
   }
   const handleOk = () => {
     setIsModalOpen(false);
@@ -106,12 +110,15 @@ const Admin: React.FC = () => {
          dataSource={logModalData} 
          pagination={{
           total: logTotal,
-          current: logTableCurrentPage,
+          current: logTableCurrentOffset===0?1:(logTableCurrentOffset/10)+1,
            onChange: (page) => {
-            setLogTableCurrentPage((page-1)*10);
+              setLogTableCurrentOffset((page-1)*10);
             }
-          }}>
-            <Column title="操作类型" key="operateType" width={'30%'} render={
+          }}
+          >
+            <Column title="操作类型" key="operateType" width={'30%'}
+              dataIndex={'operateType'}
+              render={
               (_, { operateType }: {
                 operateType: string
               }) => (
@@ -121,7 +128,7 @@ const Admin: React.FC = () => {
                 }}>{ operateType}</span>
               )
              }/>
-            <Column title="操作者"  key="operatorName" width={'20%'}
+            <Column title="操作者" dataIndex='operatorName' key="operatorName" width={'20%'}
               render={(_, record: {
                 operateType: string
                 operatorName: string
@@ -143,14 +150,14 @@ const Admin: React.FC = () => {
                 }}>{record?.updatedTime}</span>
               )}
             />
-          </Table>
+      </Table>
   </Modal>
   <Table dataSource={roleList} pagination={{
           total: mainTotal,
-          current: mainTableCurrentPage,
-          onChange: (page) => {
-            setMainTableCurrentPage(page);
-          }
+         current: mainTableCurrentOffset===0?1:(mainTableCurrentOffset/10)+1,
+           onChange: (page) => {
+              setMainTableCurrentOffset((page-1)*10);
+            }
         }}>
     <Column title="ID" dataIndex="roleId" key="id" width={'5%'} />
     <Column title="Name" dataIndex="roleName" key="roleName" width={'60%'} />
@@ -181,7 +188,9 @@ const Admin: React.FC = () => {
                 <Button onClick={() => {
                   showModal(record.roleId,record.roleName)
                 }}>操作日志</Button>
-                <Button onClick={() => {
+                <Button
+                  disabled={!!record?.isDelete}
+                  onClick={() => {
                   Modal.confirm({
                     title: '确认删除该角色吗',
                     content:   <div>
@@ -196,6 +205,13 @@ const Admin: React.FC = () => {
                       try {
                         await deleteRoleById({ roleId: record.roleId })
                         message.success('删除角色成功')
+                        const recordIndex = roleList.findIndex((item) => item.roleId === record.roleId)
+                        const newRoleList = [...roleList]
+                        newRoleList[recordIndex] = {
+                          ...newRoleList[recordIndex],
+                          isDelete: 1
+                        }
+                        setRoleList(newRoleList)
                       } catch (error) {
                         message.error('删除角色失败')
                       }
@@ -204,7 +220,7 @@ const Admin: React.FC = () => {
                  }}>删除</Button>
                 <Button type='primary' onClick={() => {
                   history.push(`/role/edit/${record.roleId}`)
-                }}>编辑</Button>
+                }} disabled={!!record?.isDelete}>编辑</Button>
               </div>
               
       )}
