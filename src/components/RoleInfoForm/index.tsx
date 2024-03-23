@@ -234,24 +234,17 @@ const RoleInfoFrom = ({ roleData }) => {
    <ProFormTextArea
       name="greetings"
       label="Greetings"
-      required />
+      />
        <ProFormTextArea
       name="textDetailDesc"
       label="TextDetailDesc"
       required />   <ProFormTextArea
       name="scene"
       label="Scene"
-      required
     />
     <ProFormTextArea
       name="costume"
       label="Costume"
-      required
-      rules={[{
-        // length>0
-        required: true,
-        message: 'Please input your Costume!',
-      }]}
     />
     <ProFormTextArea
       name="informationShow"
