@@ -41,6 +41,7 @@ const beforeUpload = (file: FileType) => {
 
 
 const GenderOptions = ['男', '女', '未知'];
+const ConstellationOptions =["Scorpio","Pisces","Virgo","Taurus","Gemini","Cancer","Leo","Libra","Sagittarius","Aquarius","Aries","Capricorn" ]
 
 const RoleInfoFrom = ({ roleData }) => {
   const formRef = useRef<
@@ -132,9 +133,27 @@ const RoleInfoFrom = ({ roleData }) => {
       }
    }
   
+  type LayoutType = Parameters<typeof ProForm>[0]['layout'];
+const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
+
+    const [formLayoutType, setFormLayoutType] = useState<LayoutType>(
+    LAYOUT_TYPE_HORIZONTAL,
+  );
+
+  const formItemLayout =
+    formLayoutType === LAYOUT_TYPE_HORIZONTAL
+      ? {
+          labelCol: { span: 4 },
+          wrapperCol: { span: 14 },
+        }
+      : null;
+
+  
   return<ProForm<{
       useMode?: string;
   }>
+     {...formItemLayout}
+      layout={formLayoutType}
     onFinish={async (values) => {
       try {
         const postData = {
@@ -227,15 +246,18 @@ const RoleInfoFrom = ({ roleData }) => {
       name="Identity"
       label="Identity"
       required />
-   <ProFormTextArea
-      name="constellation"
-      label="Constellation"
-      required />
+   <ProFormSelect
+    name="constellation"
+      label={`Constellation`}
+    options={ConstellationOptions}
+      placeholder="Please select a Constellation"
+      required
+  />
    <ProFormTextArea
       name="greetings"
       label="Greetings"
       />
-       <ProFormTextArea
+    <ProFormTextArea
       name="textDetailDesc"
       label="TextDetailDesc"
       required />   <ProFormTextArea
@@ -251,12 +273,12 @@ const RoleInfoFrom = ({ roleData }) => {
       label="InformationShow"
       required
     />
-     <ProFormSelect
+    <ProFormSelect
+      required
     name="voice"
       label={`Voice\n（创建后不可编辑）`}
     options={voiceList}
     placeholder="Please select a Voice"
-    rules={[{ required: true, message: 'Please select your country!' }]}
   />
     <ProFormDigit
       name="payVal"

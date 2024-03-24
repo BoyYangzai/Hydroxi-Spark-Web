@@ -92,10 +92,19 @@ const [previewOpen, setPreviewOpen] = useState(false);
      <ProFormTextArea
       name={`intimacyInfoLevel${relationLevel}`}
       label={`${relationLevel}级亲密度`}
+      fieldProps={{ style: { height: 300 } }}
       required />
     
-    <ProForm.Item label={`${relationLevel}级图片（锁定，上传尺寸：\n 892*1184）`}
-      labelCol={{ span: 30 }}
+    <ProForm.Item label={<div style={{
+      marginTop: '20px',
+    }}>
+      {
+        `${relationLevel}级图片（锁定，上传\n `
+      }
+        <div>
+      尺寸：892*1184）
+        </div>
+   </div>}
       style={{
         height: '200px',
       }}
