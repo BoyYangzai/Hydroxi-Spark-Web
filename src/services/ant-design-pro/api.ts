@@ -1,5 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
+import { LineChartData } from '@/components/Chart/LineChartCard';
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 
 const API_PREFIX = 'https://stg-social.hydrox.ai';
@@ -170,7 +171,9 @@ export async function getEventOrFieldList(
 }
 
 export async function getEventLineChartData(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/admin/emit/lineChart', {
+  return request<
+    LineChartData
+  >('/api/admin/emit/lineChart', {
     method: 'POST',
     data: {
       ...(options || {}),
@@ -181,6 +184,20 @@ export async function getEventLineChartData(options?: { [key: string]: any }) {
 
 export async function getEventPieChartData(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/admin/emit/pieChart', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+      timeUnit: 'day',
+    },
+  });
+}
+
+
+// Data Screen
+export async function GetDataScreenDataByUrl({ url, ...options }: { [key: string]: any } & {
+  url: string
+}) {
+  return request<LineChartData>(url, {
     method: 'POST',
     data: {
       ...(options || {}),

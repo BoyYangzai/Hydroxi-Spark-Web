@@ -11,6 +11,7 @@ import { DatePicker } from 'antd';
 import type { TimeRangePickerProps } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import ChatCard from '@/components/common/ChartCard';
+import { LineChartData } from '@/components/Chart/LineChartCard';
 
 const { RangePicker } = DatePicker;
 
@@ -19,11 +20,13 @@ const rangePresets: TimeRangePickerProps['presets'] = [
   { label: '最近30天', value: [dayjs().add(-30, 'd'), dayjs()] },
 ];
 
+
 const EditRole: React.FC = () => {
   const intl = useIntl();
   const [eventOptions, setEventOptions] = useState<[]>([]);
   const [fieldOptions, setFieldOptions] = useState<[]>([]);
   const [currentSelectedEventId, setCurrentSelectedEventId] = useState<string>('');
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [timeRange, setTimeRange] = useState<{
     beginTime: string;
     endTime: string;
@@ -31,6 +34,7 @@ const EditRole: React.FC = () => {
     beginTime: dayjs().add(-7, 'd').format('YYYY-MM-DD'),
     endTime: dayjs().format('YYYY-MM-DD'),
   });
+const [submitBtnText,setSubmitBtnText]=useState<string>('查询')
 
   const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
     if (dates) {
@@ -51,6 +55,10 @@ const EditRole: React.FC = () => {
   >();
 
   const fetchListByType = async ({ isEventField }: { isEventField: boolean }) => {
+    if (isEventField) {
+      setSubmitLoading(true)
+      setSubmitBtnText('获取变量列表中...')
+    }
     const { data } = await getEventOrFieldList({
       eventName: isEventField ? currentSelectedEventId : '',
     });
@@ -70,6 +78,11 @@ const EditRole: React.FC = () => {
   };
 
   useEffect(() => {
+    setSubmitLoading(false)
+    setSubmitBtnText('查询')
+  }, [fieldOptions])
+  
+  useEffect(() => {
     fetchListByType({ isEventField: false });
   }, []);
 
@@ -80,14 +93,10 @@ const EditRole: React.FC = () => {
   }, [currentSelectedEventId]);
 
   // render chart
-  const [lineChartData, setLineChartData] = useState<{
-    data: any[];
-    xKey?: string;
-    yKey?: string;
-  }>({
-    data: [],
+  const [lineChartData, setLineChartData] = useState<LineChartData>({
     xKey: 'x',
     yKey: 'y',
+    data:[]
   });
   const [pieChartData, setPieChartData] = useState([]);
 
@@ -104,38 +113,60 @@ const EditRole: React.FC = () => {
       return {
         [lineData?.xKey]: i.xValue,
         [lineData?.yKey]: i.yValue,
+        field: i.field,
       };
     });
     setLineChartData({
       ...lineData,
       data: transformLineData,
     });
+
+    console.log('pieData', pieData);
     setPieChartData(pieData?.data);
   };
 
   const renderLineChart = (chart) => {
+    const resLineData = lineChartData?.hasField==0 ? lineChartData?.data?.map(i => {
+      return {
+        ...i,
+        field: '全部',
+      }
+    }) : lineChartData?.data;
+    
     chart
-      .data(lineChartData?.data)
+      .data(resLineData)
       .encode('x', lineChartData?.xKey)
       .encode('y', lineChartData?.yKey)
+      .encode('color', 'field')
       .scale('x', {
         range: [0, 1],
       })
       .scale('y', {
         nice: true,
       })
-      .axis('y', { labelFormatter: (d) => d + '°C' });
+      .axis('y', { labelFormatter: (d) => d });
 
+   
     chart.line().encode('shape', 'smooth');
     chart.point().encode('shape', 'point').tooltip(false);
     chart.render();
   };
 
   const renderPieChart = (chart) => {
+    const hasFiled = pieChartData?.length==1&&pieChartData?.[0].percent==1 
+    const resPieData =pieChartData?.map(i => {
+      return {
+        ...i,
+        item:hasFiled ? '全部': i.item,
+        percent: Number(i.percent),
+      }
+     }
+    );
+    console.log('resPieData', resPieData);
     chart.coordinate({ type: 'theta', outerRadius: 0.8 });
     chart
       .interval()
-      .data(pieChartData)
+      .data(resPieData)
       .transform({ type: 'stackY' })
       .encode('y', 'percent')
       .encode('color', 'item')
@@ -153,7 +184,9 @@ const EditRole: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    setSubmitLoading(true);
     await fetchChartData();
+    setSubmitLoading(false);
   };
 
   return (
@@ -164,8 +197,8 @@ const EditRole: React.FC = () => {
       })}
       extra={
         <>
-          <Button type="primary" onClick={handleSubmit}>
-            查询
+          <Button type="primary" onClick={handleSubmit} loading={submitLoading} disabled={!currentSelectedEventId}>
+            {submitBtnText}
           </Button>
           <RangePicker
             presets={rangePresets}

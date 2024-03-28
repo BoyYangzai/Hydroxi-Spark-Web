@@ -30,7 +30,7 @@ export default [
       {
         name: 'data_screen',
         path: '/analysis/data_screen',
-        component: './Analysis/EventScreen',
+        component: './Analysis/DataScreen',
       },
       {
         name: 'event_screen',

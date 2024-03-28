@@ -2,23 +2,25 @@ import { Card } from 'antd';
 import { Chart } from '@antv/g2';
 import { useEffect, useState } from 'react';
 
+
+export interface ChartCardProps {
+  title?: string;
+  id?: string;
+  chartRenderAction?: (chart: Chart) => void;
+  style?: React.CSSProperties;
+  data?: any;
+}
 const ChatCard = ({
   chartRenderAction,
   title,
   id,
   style,
   data,
-}: {
-  title?: string;
-  id?: string;
-  chartRenderAction?: (chart: Chart) => void;
-  style?: React.CSSProperties;
-}) => {
+}: ChartCardProps) => {
   const [chart, setChart] = useState<Chart | null>(null);
   const mergedId = id ?? title;
 
   useEffect(() => {
-    console.log('data', data);
     if (!chart) {
       const newChart = new Chart({
         container: mergedId,
