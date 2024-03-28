@@ -46,7 +46,8 @@ interface PresetLineChartCard {
       extraPayload?: {
         [key: string]: any;
       },
-      hasField?:0|1
+    hasField?: 0 | 1,
+    actionSlot?: React.ReactNode[]
     } 
 }
 const EditRole: React.FC = () => {
@@ -80,7 +81,6 @@ const EditRole: React.FC = () => {
   >();
 
   // render chart
- 
   const [lineChartData, setLineChartData] = useState<PresetLineChartCard&LineChartData | PresetLineChartCard>({
     nu: {
       title: '新增用户数',
@@ -98,8 +98,35 @@ const EditRole: React.FC = () => {
       extraPayload: {
         activityType:ActivityType.day
       },
-      hasField:0
-      
+      hasField: 0,
+      actionSlot: [
+         <ProFormSelect
+          width={160}
+          options={[
+            {
+              label:'日活',
+              value:ActivityType.day,
+            }, {
+                  label:'月活',
+              value:ActivityType.month,
+             }
+            ]
+            }
+            placeholder={'请选择活跃度种类'}
+          onChange={async (value) => {
+            setLineChartData(pre => ({
+              ...pre,
+              au: {
+                ...pre['au'],
+                extraPayload: {
+                activityType:value
+                }
+              }
+              }))
+            }}
+            noStyle
+        />
+      ]
     },
     rr: {
       title: '新用户留存',
@@ -213,6 +240,7 @@ const EditRole: React.FC = () => {
                   title={chartData.title}
                   id={`${key}Line`}
                   lineChartData={lineChartData[key]}
+                  actionSlot={chartData?.actionSlot}
                 />
               );
             }

@@ -9,6 +9,7 @@ export interface ChartCardProps {
   chartRenderAction?: (chart: Chart) => void;
   style?: React.CSSProperties;
   data?: any;
+  actionSlot?:React.ReactNode[]
 }
 const ChatCard = ({
   chartRenderAction,
@@ -16,6 +17,7 @@ const ChatCard = ({
   id,
   style,
   data,
+  actionSlot
 }: ChartCardProps) => {
   const [chart, setChart] = useState<Chart | null>(null);
   const mergedId = id ?? title;
@@ -34,7 +36,7 @@ const ChatCard = ({
   }, [data]);
 
   return (
-    <Card title={title} style={style}>
+    <Card title={title} style={style} extra={actionSlot}>
       <div id={mergedId}></div>
     </Card>
   );
