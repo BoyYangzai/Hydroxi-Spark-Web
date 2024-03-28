@@ -74,7 +74,7 @@ export async function updateRule(options?: { [key: string]: any }) {
     data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -85,7 +85,7 @@ export async function addRule(options?: { [key: string]: any }) {
     data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -96,17 +96,16 @@ export async function removeRule(options?: { [key: string]: any }) {
     data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }
-
 
 export async function getRoleList(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/admin/role/list', {
     method: 'POST',
     data: {
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -115,17 +114,16 @@ export async function getRoleDetailById(options?: { [key: string]: any }) {
     method: 'POST',
     data: {
       ...(options || {}),
-    }
+    },
   });
 }
-
 
 export async function getVoiceList(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/admin/role/voice', {
     method: 'GET',
     data: {
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -134,7 +132,7 @@ export async function saveRoleDetail(options?: { [key: string]: any }) {
     method: 'POST',
     data: {
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -143,16 +141,50 @@ export async function deleteRoleById(options?: { [key: string]: any }) {
     method: 'POST',
     data: {
       ...(options || {}),
-    }
+    },
   });
 }
-
 
 export async function getLogByRoleId(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/admin/role/log', {
     method: 'POST',
     data: {
       ...(options || {}),
-    }
+    },
+  });
+}
+
+// Analysis
+export async function getEventOrFieldList(
+  options?: { eventName?: string } & { [key: string]: any },
+) {
+  const url = options?.eventName
+    ? `/api/admin/emit/eventList?eventName=${options?.eventName}`
+    : '/api/admin/emit/eventList';
+  return request<Record<string, any>>(url, {
+    method: 'GET',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function getEventLineChartData(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/emit/lineChart', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+      timeUnit: 'day',
+    },
+  });
+}
+
+export async function getEventPieChartData(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/emit/pieChart', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+      timeUnit: 'day',
+    },
   });
 }

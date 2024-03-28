@@ -23,10 +23,21 @@ export default [
     ],
   },
   {
-    path: '/welcome',
-    name: 'welcome',
+    path: '/analysis',
+    name: 'analysis',
     icon: 'smile',
-    component: './Welcome',
+    routes: [
+      {
+        name: 'data_screen',
+        path: '/analysis/data_screen',
+        component: './Analysis/EventScreen',
+      },
+      {
+        name: 'event_screen',
+        path: '/analysis/event_screen',
+        component: './Analysis/EventScreen',
+      },
+    ],
   },
   {
     path: '/role',
@@ -49,7 +60,11 @@ export default [
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/analysis/data_screen',
+  },
+  {
+    path: '/analysis',
+    redirect: '/analysis/data_screen',
   },
   {
     path: '*',

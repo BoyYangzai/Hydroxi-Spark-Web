@@ -1,5 +1,7 @@
 export default {
-  'menu.welcome': '数据平台',
+  'menu.analysis': '数据平台',
+  'menu.analysis.data_screen': '大盘数据',
+  'menu.analysis.event_screen': '功能模块数据',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
   'menu.admin': '角色管理平台',
