@@ -74,11 +74,9 @@ const EditRole: React.FC = () => {
   };
   const formRef = useRef<
     ProFormInstance<{
-      name: string;
-      company?: string;
-      useMode?: string;
+      timeUnit: TimeUnits;
     }>
-  >();
+    >();
 
   // render chart
   const [lineChartData, setLineChartData] = useState<PresetLineChartCard&LineChartData | PresetLineChartCard>({
@@ -119,7 +117,7 @@ const EditRole: React.FC = () => {
               au: {
                 ...pre['au'],
                 extraPayload: {
-                activityType:value
+                  activityType:value
                 }
               }
               }))
@@ -140,8 +138,9 @@ const EditRole: React.FC = () => {
        ...timeRange,
       ...formRef.current?.getFieldsValue(),
     };
+
     const allChartData = await Promise.all(Object.keys(lineChartData).map(key => {
-      const lineChartItem=lineChartData[key]
+      const lineChartItem = lineChartData[key]
       return GetDataScreenDataByUrl({
         url: lineChartItem.requestUrl,
         ...lineChartItem?.extraPayload,
@@ -194,15 +193,37 @@ const EditRole: React.FC = () => {
           <ProFormSelect
             width={160}
             options={Array.from(Object.values(TimeUnits)).map((i) => {
-              return { label: i, value: i };
+                return { label: i, value: i };
               })
             }
             placeholder={'请选择时间单位'}
             name="timeUnit"
             onChange={async (value) => {
-                setTimeUnit(value);
+              setTimeUnit(value);
+              switch (value) {
+               case TimeUnits.day:
+                setTimeRange({
+                  beginTime: dayjs().add(-7, 'd').format('YYYY-MM-DD'),
+                  endTime: dayjs().format('YYYY-MM-DD'),
+                });
+                  break;
+                case TimeUnits.month:
+                setTimeRange({
+                  beginTime: dayjs().add(-1, 'M').format('YYYY-MM'),
+                  endTime: dayjs().format('YYYY-MM'),
+                });
+                  break;
+                case TimeUnits.year:
+                setTimeRange({
+                  beginTime: dayjs().add(-1, 'y').format('YYYY'),
+                  endTime: dayjs().format('YYYY'),
+                });
+                  break;
+              }
+
             }}
             noStyle
+            initialValue={TimeUnits.day}
             />
           <RangePicker
             presets={timeUnit === TimeUnits.day ? rangePresets : []}

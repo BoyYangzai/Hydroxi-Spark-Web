@@ -201,7 +201,6 @@ export async function GetDataScreenDataByUrl({ url, ...options }: { [key: string
     method: 'POST',
     data: {
       ...(options || {}),
-      timeUnit: 'day',
     },
   });
 }
