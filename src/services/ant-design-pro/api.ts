@@ -3,7 +3,7 @@
 import { LineChartData } from '@/components/Chart/LineChartCard';
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 
-const API_PREFIX = 'https://stg-social.hydrox.ai';
+const API_PREFIX = process.env.API_PREFIX ?? 'https://stg-social.hydrox.ai';
 console.log('API_PREFIX', API_PREFIX);
 
 export async function request<T>(url: string, options?: any): Promise<AxiosResponse<T>> {
