@@ -3,7 +3,11 @@
 import { LineChartData } from '@/components/Chart/LineChartCard';
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 
-const API_PREFIX = process.env.NODE_ENV === 'production' ? 'https://social.hydrox.ai' : 'https://stg-social.hydrox.ai';
+console.log('ENVIRONMENT:', process.env.NODE_ENV);
+const API_PREFIX =
+  process.env.NODE_ENV === 'production'
+    ? 'https://social.hydrox.ai'
+    : 'https://stg-social.hydrox.ai';
 
 export async function request<T>(url: string, options?: any): Promise<AxiosResponse<T>> {
   return originalRequest(url.startsWith('/') ? API_PREFIX + url : url, options);
@@ -170,9 +174,7 @@ export async function getEventOrFieldList(
 }
 
 export async function getEventLineChartData(options?: { [key: string]: any }) {
-  return request<
-    LineChartData
-  >('/api/admin/emit/lineChart', {
+  return request<LineChartData>('/api/admin/emit/lineChart', {
     method: 'POST',
     data: {
       ...(options || {}),
@@ -191,10 +193,12 @@ export async function getEventPieChartData(options?: { [key: string]: any }) {
   });
 }
 
-
 // Data Screen
-export async function GetDataScreenDataByUrl({ url, ...options }: { [key: string]: any } & {
-  url: string
+export async function GetDataScreenDataByUrl({
+  url,
+  ...options
+}: { [key: string]: any } & {
+  url: string;
 }) {
   return request<LineChartData>(url, {
     method: 'POST',
