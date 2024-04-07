@@ -3,7 +3,7 @@
 import { LineChartData } from '@/components/Chart/LineChartCard';
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 
-console.log('ENVIRONMENT:', process.env.NODE_ENV);
+console.log('process.env:', process.env);
 const API_PREFIX =
   process.env.NODE_ENV === 'production'
     ? 'https://social.hydrox.ai'
