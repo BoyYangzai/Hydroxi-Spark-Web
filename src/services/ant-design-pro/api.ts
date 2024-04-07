@@ -3,10 +3,7 @@
 import { LineChartData } from '@/components/Chart/LineChartCard';
 import { AxiosResponse, request as originalRequest } from '@umijs/max';
 console.log('process.env:', process.env);
-const API_PREFIX =
-  process.env.NODE_ENV === 'production'
-    ? 'https://social.hydrox.ai'
-    : 'https://stg-social.hydrox.ai';
+const API_PREFIX = process.env.UMI_APP_API_PREFIX ?? 'https://stg-social.hydrox.ai';
 
 export async function request<T>(url: string, options?: any): Promise<AxiosResponse<T>> {
   return originalRequest(url.startsWith('/') ? API_PREFIX + url : url, options);
