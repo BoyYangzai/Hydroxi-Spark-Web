@@ -297,6 +297,12 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       label="每个等级亲密度数值"
       width="md"
       required />
+    
+       <ProFormTextArea
+      name="chatLimitPrompt"
+      label="ChatLimitPrompt"
+      required
+    />
     {
       maxRelationship > 0 && Array.from({ length: maxRelationship }).map((_, index) => {
         return <RelationshipItem key={index} relationLevel={index + 1} roleShowInfo={roleData?.roleShowInfos?.[index]} setRoleShowsInfos={(fileSrtList: string[]) => {
