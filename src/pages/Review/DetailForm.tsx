@@ -6,12 +6,12 @@ import {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import {  Upload, message } from 'antd';
+import {  Button, Upload, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import type { GetProp, UploadProps } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import RelationshipItem from './RelationshipItem';
-import { getVoiceList, saveRoleDetail } from '@/services/ant-design-pro/api';
+import { approveReview, getVoiceList, saveRoleDetail } from '@/services/ant-design-pro/api';
+import ButtonGroup from 'antd/es/button/button-group';
 
 interface RelationshipInfo{
    intimacyInfoLevel: number;
@@ -42,7 +42,8 @@ const beforeUpload = (file: FileType) => {
 const GenderOptions = ['男', '女', '未知'];
 const ConstellationOptions =["Scorpio","Pisces","Virgo","Taurus","Gemini","Cancer","Leo","Libra","Sagittarius","Aquarius","Aries","Capricorn" ]
 
-const RoleInfoFrom = ({ roleData }) => {
+const DetailInfoFrom = ({ roleData }) => {
+  console.log(roleData)
   const formRef = useRef<
     ProFormInstance<{
       name: string;
@@ -99,13 +100,6 @@ const RoleInfoFrom = ({ roleData }) => {
     setImageUrl(roleData?.avatar)
     formRef.current?.setFieldsValue({
       ...roleData,
-      ...roleData?.roleShowInfos?.map((item) => {
-        return {
-          [`intimacyInfoLevel${item?.intimacyInfoLevel}`]: item?.relationPrompt
-        }
-      }).reduce((result, currentObject) => {
-          return { ...result, ...currentObject };
-      }, {})
     })
     getAllVoice()
     setRoleShowsInfos(roleData?.roleShowInfos ?? [])
@@ -153,22 +147,6 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
   }>
      {...formItemLayout}
       layout={formLayoutType}
-    onFinish={async (values) => {
-      try {
-        const postData = {
-          roleId: roleData?.roleId,
-         avatar:imageUrl,
-        ...values,
-        RoleShowInfos:roleShowsInfos
-      }
-        console.log('postData', postData)
-        await saveRoleDetail(postData)
-        message.success('提交成功');
-      }catch (error) {
-        message.error('提交失败请重试');
-      }
-
-    }}
     onChange={handleFormChange}
     formRef={formRef}
     params={{ id: '100' }}
@@ -178,11 +156,26 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       return value.format('YYYY/MM/DD HH:mm:ss');
     }}
     autoFocusFirstInput
-    layout='horizontal'
+    submitter={false}
     >
-        <ProFormText
+    <ProFormText
+      disabled
+      
           width="md"
-          name="roleName"
+          name="creatorId"
+          required
+          dependencies={[['contract', 'name']]}
+          label="Creator ID"
+          tooltip="最长为 24 位"
+          placeholder="请输入 Name"
+          rules={[{ required: true, message: '这是必填项' }]}
+    />
+    
+    <ProFormText
+      disabled
+      
+          width="md"
+          name="name"
           required
           dependencies={[['contract', 'name']]}
           label="Name"
@@ -191,7 +184,10 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
           rules={[{ required: true, message: '这是必填项' }]}
         />
    
+   
     <ProFormSelect
+      disabled
+      
       width={340}
     name="gender"
     label={`Gender`}
@@ -210,11 +206,14 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       name="age"
       label="Age"
       width="md"
+      disabled
+
       required />
     <ProForm.Item  label='Avatar' required>
     <Upload
         name="avatar"
-        listType='picture-circle'
+        listType='picture-a'
+        disabled
         className="avatar-uploader"
         showUploadList={false}
         beforeUpload={beforeUpload}
@@ -228,97 +227,99 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
           }
         }
       >
-        {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+        {imageUrl ? <img src={imageUrl} alt="avatar" style={{
+          width: '130px',
+          height: '130px'
+        }}
+        /> : uploadButton}
       </Upload>
+    </ProForm.Item>
+        <ProForm.Item  label='Photo' required>
+      <img src={roleData?.photo} alt="avatar" style={{
+        width: '130px',
+        height: '190px'
+      }}
+        />
     </ProForm.Item>
 
    <ProFormTextArea
-      name="character"
-      label="Character"
+      name="personality"
+      label="Personality"
+      disabled
+
       required />
     
    <ProFormTextArea
-      name="hobby"
-      label="Hobby"
+      name="ourRelationshipDescription"
+      label="Our Relationship description"
+      disabled
+
       required />
    <ProFormTextArea
-      name="Identity"
-      label="Identity"
+      name="relationshipLabel"
+      label="Relationship label"
+      disabled
+
       required />
-   <ProFormSelect
-    name="constellation"
-      label={`Constellation`}
-    options={ConstellationOptions}
-      placeholder="Please select a Constellation"
-      required
-  />
-   <ProFormTextArea
-      name="greetings"
-      label="Greetings"
-      />
-    <ProFormTextArea
-      name="textDetailDesc"
-      label="TextDetailDesc"
-      required />   <ProFormTextArea
-      name="scene"
-      label="Scene"
-    />
-    <ProFormTextArea
-      name="costume"
-      label="Costume"
-    />
-    <ProFormTextArea
-      name="informationShow"
-      label="InformationShow"
-      required
-    />
-    <ProFormSelect
-      required
-    name="voice"
-      label={`Voice\n（创建后不可编辑）`}
-    options={voiceList}
-    placeholder="Please select a Voice"
-  />
-    <ProFormDigit
-      name="payVal"
-      label="角色价格（金币"
-      width="md"
-      required
-    />
-    <ProFormDigit
-      name="maxIntimacyLevel"
-      label="最大亲密度等级"
-      width="md"
-      required
-    />
-    <ProFormDigit
-      name="oneIntimacyValue"
-      label="每个等级亲密度数值"
-      width="md"
+       <ProFormTextArea
+      name="relationshipLabel"
+      label="Relationship label"
+      disabled
+
       required />
     
        <ProFormTextArea
-      name="chatLimitPrompt"
-      label="ChatLimitPrompt"
-      required
-    />
-    {
-      maxRelationship > 0 && Array.from({ length: maxRelationship }).map((_, index) => {
-        return <RelationshipItem key={index} relationLevel={index + 1} roleShowInfo={roleData?.roleShowInfos?.[index]} setRoleShowsInfos={(fileSrtList: string[]) => {
-          const newList: RelationshipInfo[] = [
-            ...roleShowsInfos,
-            ]
-          newList[index] = {
-            intimacyInfoLevel: index + 1,
-            relationPrompt: roleShowsInfos[index]?.relationPrompt??'',
-            roleShows: fileSrtList
-          }
-          setRoleShowsInfos(newList)
-        }} />
-      })
-    }
+      name="ourStory"
+      label="Our story"
+      disabled
+      required />
+    
+    <div style={{
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center'
+      
+    }}>
+      <div
+        style={{
+          width: '76%',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          gap: '20px',
+        }}>
+        <Button type="primary" htmlType="submit"
+           style={{
+            width: '220px',
+            height: '40px'
+          }}
+              onClick={async () => {
+                    await approveReview(roleData.roleId)
+                    message.success('审核通过')
+                }}
+        >
+        通过
+      </Button>
+        <Button htmlType="submit"
+          type='default'
+          style={{
+            width: '220px',
+            height: '40px'
+        }}>
+        下架
+      </Button>
+        <Button htmlType="submit"
+          type='default'
+           style={{
+            width: '220px',
+            height: '40px'
+        }}
+        >
+        流水
+      </Button>
+    </div>
+     </div>
     </ProForm>
 }
 
 
-export default RoleInfoFrom
+export default DetailInfoFrom

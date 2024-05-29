@@ -7,6 +7,7 @@ export default {
   'menu.admin': '角色管理平台',
   'menu.newRole': '新建角色',
   'menu.edit': '角色管理平台',
+  'menu.review': '角色审核管理',
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register-result': '注册结果',

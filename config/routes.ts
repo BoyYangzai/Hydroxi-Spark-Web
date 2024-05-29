@@ -59,6 +59,18 @@ export default [
     hideInMenu: true,
   },
   {
+    name: 'review',
+    path: '/review',
+    icon: 'book',
+    component: './Review/Review',
+  },
+  {
+    name: 'review',
+    path: '/review/:id',
+    component: './Review/Detail',
+    hideInMenu: true,
+  },
+  {
     path: '/',
     redirect: '/analysis/data_screen',
   },

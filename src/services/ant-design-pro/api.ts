@@ -203,3 +203,56 @@ export async function GetDataScreenDataByUrl({
     },
   });
 }
+
+
+
+// Review
+export async function getReviewList(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/admin/review/list', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+
+export async function approveReview(roleId: string) {
+  return request<Record<string, any>>('/api/admin/review/approve', {
+    method: 'POST',
+    data: {
+      roleId
+    },
+  });
+}
+
+export async function deListReview(roleId: string) {
+  return request<Record<string, any>>('/api/admin/review/deList', {
+    method: 'POST',
+    data: {
+      roleId
+    },
+  });
+}
+
+export async function getReviewRoleDetail(roleId: number) {
+  return request<Record<string, any>>('/api/admin/review/detail', {
+    method: 'POST',
+    data: {
+      roleId
+    },
+  });
+}
+
+
+
+export async function getCustomRoleLogByRoleId(data: {
+  "roleId": number
+  "startTime": string
+  "endTime": string
+}) {
+  return request<Record<string, any>>('/api/admin/review/billList', {
+    method: 'POST',
+    data
+  });
+}
