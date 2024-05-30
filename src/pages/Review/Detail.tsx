@@ -1,9 +1,10 @@
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
-import {  Button, Card } from 'antd';
+import {  Button, Card, Modal, message } from 'antd';
 import React, { useEffect } from 'react';
-import { getReviewRoleDetail, getRoleDetailById } from '@/services/ant-design-pro/api';
+import { deListReview, getReviewRoleDetail } from '@/services/ant-design-pro/api';
 import DetailInfoFrom from './DetailForm';
+import { ReviewStatus } from './Review';
 
 
 const Detail: React.FC = () => {
@@ -34,7 +35,22 @@ const Detail: React.FC = () => {
   ]}
     >
       <Card>
-        <DetailInfoFrom roleData={role}/>
+        <DetailInfoFrom roleData={role}
+        onDelete={() => {
+                  Modal.confirm({
+                    title: '确认下架该角色吗',
+                    onOk:async () => {
+                      try {
+                        await deListReview( role.roleId )
+                        message.success('下架角色成功')
+                        setRole({ ...role, status: ReviewStatus.DELETED })
+                      } catch (error) {
+                        message.error('下架角色失败')
+                      }
+                    },
+                  })
+                    }}
+        />
       </Card>
     </PageContainer>
   );

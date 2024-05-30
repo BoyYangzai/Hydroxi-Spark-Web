@@ -6,12 +6,13 @@ import {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import {  Button, Upload, message } from 'antd';
+import {  Button, Modal, Upload, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import type { GetProp, UploadProps } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { approveReview, getVoiceList, saveRoleDetail } from '@/services/ant-design-pro/api';
-import ButtonGroup from 'antd/es/button/button-group';
+import { approveReview, deListReview, getVoiceList } from '@/services/ant-design-pro/api';
+import { ReviewStatus } from './Review';
+import BillList from './BillList';
 
 interface RelationshipInfo{
    intimacyInfoLevel: number;
@@ -40,9 +41,10 @@ const beforeUpload = (file: FileType) => {
 
 
 const GenderOptions = ['男', '女', '未知'];
-const ConstellationOptions =["Scorpio","Pisces","Virgo","Taurus","Gemini","Cancer","Leo","Libra","Sagittarius","Aquarius","Aries","Capricorn" ]
 
-const DetailInfoFrom = ({ roleData }) => {
+const DetailInfoFrom = ({ roleData ,onDelete}: {
+  onDelete: () => void;
+}) => {
   console.log(roleData)
   const formRef = useRef<
     ProFormInstance<{
@@ -50,7 +52,6 @@ const DetailInfoFrom = ({ roleData }) => {
     }>
     >();
 
-  const [maxRelationship,setMaxRelationship] = useState(3)
 
   // Upload
   const [loading, setLoading] = useState(false);
@@ -95,37 +96,14 @@ const DetailInfoFrom = ({ roleData }) => {
   }
   // set form data
   
-  const [roleShowsInfos, setRoleShowsInfos] = useState<RelationshipInfo[]>([])
   useEffect(() => {
     setImageUrl(roleData?.avatar)
     formRef.current?.setFieldsValue({
       ...roleData,
     })
     getAllVoice()
-    setRoleShowsInfos(roleData?.roleShowInfos ?? [])
-    setMaxRelationship(roleData?.maxIntimacyLevel)
   }, [roleData])
-  console.log(roleShowsInfos,'roleShowsInfos')
 
-   const handleFormChange = (e) => {
-      if (e.target.id === 'maxIntimacyLevel') {
-        setMaxRelationship(e.target.value)
-      }
-      
-      if (e.target.id.startsWith('intimacyInfoLevel')) {
-        const index = e.target.id.split('intimacyInfoLevel')[1]
-        const newList: RelationshipInfo[] = [
-          ...roleShowsInfos,
-        ]
-        newList[index - 1] = {
-          intimacyInfoLevel: Number(index),
-          relationPrompt: e.target.value,
-          roleShows: roleShowsInfos[index - 1]?.roleShows??[]
-        }
-        setRoleShowsInfos(newList)
-      }
-   }
-  
   type LayoutType = Parameters<typeof ProForm>[0]['layout'];
 const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
 
@@ -140,14 +118,15 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
           wrapperCol: { span: 14 },
         }
       : null;
-
   
-  return<ProForm<{
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  return <>
+<BillList roleId={roleData?.roleId??''} roleName={roleData?.roleName??''} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
+    <ProForm<{
       useMode?: string;
   }>
      {...formItemLayout}
       layout={formLayoutType}
-    onChange={handleFormChange}
     formRef={formRef}
     params={{ id: '100' }}
     formKey="base-form-use-demo"
@@ -157,7 +136,8 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
     }}
     autoFocusFirstInput
     submitter={false}
-    >
+  >
+    
     <ProFormText
       disabled
       
@@ -291,7 +271,8 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
            style={{
             width: '220px',
             height: '40px'
-          }}
+           }}
+           disabled={roleData.status !== ReviewStatus.WAIT_REVIEW}
               onClick={async () => {
                     await approveReview(roleData.roleId)
                     message.success('审核通过')
@@ -304,21 +285,30 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
           style={{
             width: '220px',
             height: '40px'
-        }}>
+          }}
+          disabled={roleData.status !== ReviewStatus.REVIEWED}
+          onClick={
+                 onDelete
+               }
+        >
         下架
       </Button>
-        <Button htmlType="submit"
-          type='default'
-           style={{
-            width: '220px',
-            height: '40px'
-        }}
+          <Button htmlType="submit"
+            type='default'
+            style={{
+              width: '220px',
+              height: '40px'
+            }}
+            onClick={() => {
+              setIsModalOpen(true)
+            }}
         >
         流水
       </Button>
     </div>
      </div>
     </ProForm>
+  </>
 }
 
 

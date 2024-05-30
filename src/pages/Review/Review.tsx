@@ -1,14 +1,15 @@
 import { CheckCircleOutlined, CloseCircleOutlined, HeartTwoTone, SmileFilled, SmileTwoTone, WarningOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
-import { Alert, Button, Card, Modal, Pagination, Typography, message } from 'antd';
+import { Button, Card, Modal, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Space, Table, Tag } from 'antd';
-import { approveReview, deListReview, deleteRoleById, getCustomRoleLogByRoleId, getLogByRoleId, getReviewList, getRoleList } from '@/services/ant-design-pro/api';
+import { Table, Tag } from 'antd';
+import { approveReview, deListReview, getCustomRoleLogByRoleId, getReviewList } from '@/services/ant-design-pro/api';
+import BillList from './BillList';
 
 const { Column } = Table;
 
-enum ReviewStatus {
+export enum ReviewStatus {
   WAIT_REVIEW = 0,
   REVIEWED = 1,
   NOT_APPROVED = 2,
@@ -41,128 +42,17 @@ const Admin: React.FC = () => {
   
 
   // Log Modal
+  const [roleLogSelected, setRoleLogSelected] = useState<DataType>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roleLogSelected, setRoleLogSelected] = useState<DataType | null>(null);
-  const [logModalData,setLogModalData] = useState<
-        {
-        operateType: string,
-        operatorName: string,
-        updatedTime:string,
-    }[]>([])
-  const [logTotal, setLogTotal] = React.useState(0);
-  const [logTableCurrentOffset, setLogTableCurrentOffset] = React.useState(0);
-  const fetchLogData = async (roleId?: number) => {
-    if (!roleId) return;
-    const { data } = await getCustomRoleLogByRoleId({
-      roleId,
-      startTime: '2021-01-01',
-      endTime: '2025-01-01'
-    })
-    setLogTotal(data.total) 
-    setLogModalData(data.logs)
-  }
-  const showModal = async (roleId:number,roleName:string) => {
-    setIsModalOpen(true);
-    setRoleLogSelected({
-      roleId,
-      roleName
-    })
-    await fetchLogData(roleId)
-  };
-
-  useEffect(() => {
-    if(isModalOpen){
-      fetchLogData(roleLogSelected?.roleId)
-    }
-  }, [logTableCurrentOffset,isModalOpen])
-
-
-  const clearState = () => {
-    setIsModalOpen(false);
-    setLogTableCurrentOffset(0)
-    setLogTotal(0)
-    setLogModalData([])
-  }
-  const handleOk = () => {
-    setIsModalOpen(false);
-    clearState()
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    clearState()
-  };
   return (
     <PageContainer
       content={intl.formatMessage({
         id: '平台创作者生产角色的审核，购买情况',
         defaultMessage: '平台创作者生产角色的审核，购买情况',
       })}
-       extra={[
-         <Button key="1" type="primary" onClick={() => {
-           history.push('/role/new_role')
-         }}>
-           新增角色
-    </Button>,
-  ]}
 >
 <Card>
-   <Modal title={`${roleLogSelected?.roleName} 流水单`} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} 
-          footer={
-           (_, { OkBtn }) => (
-                <>
-                  <OkBtn />
-                </>
-              )
-        }
-        >
-      <Table 
-          size='small'
-         dataSource={logModalData} 
-         pagination={{
-          total: logTotal,
-          current: logTableCurrentOffset===0?1:(logTableCurrentOffset/10)+1,
-           onChange: (page) => {
-              setLogTableCurrentOffset((page-1)*10);
-            }
-          }}
-          >
-            <Column title="操作类型" key="operateType" width={'30%'}
-              dataIndex={'operateType'}
-              render={
-              (_, { operateType }: {
-                operateType: string
-              }) => (
-                <span style={{
-                  color: operateType === '删除角色' ? 'red' : undefined,
-                  height:'100%'
-                }}>{ operateType}</span>
-              )
-             }/>
-            <Column title="操作者" dataIndex='operatorName' key="operatorName" width={'20%'}
-              render={(_, record: {
-                operateType: string
-                operatorName: string
-              }) => (
-                <span style={{
-                  color: record?.operateType === '删除角色' ? 'red' : undefined,
-                  height:'100%'
-                }}>{record?.operatorName}</span>
-              )}
-            />
-            <Column title="操作时间" key="updatedTime" width={'50%'}
-              render={(_,  record: {
-                operateType: string
-                updatedTime: string
-              }) => (
-                <span style={{
-                  color: record?.operateType === '删除角色' ? 'red' : undefined,
-                  height:'100%'
-                }}>{record?.updatedTime}</span>
-              )}
-            />
-      </Table>
-  </Modal>
+<BillList roleId={roleLogSelected?.roleId??''} roleName={roleLogSelected?.roleName??''} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
   <Table dataSource={roleList} pagination={{
           total: mainTotal,
          current: mainTableCurrentOffset===0?1:(mainTableCurrentOffset/10)+1,
@@ -203,8 +93,9 @@ const Admin: React.FC = () => {
                 alignItems: 'center',
                 gap: '10px'
               }}>
-                <Button onClick={() => {
-                  showModal(record.roleId,record.roleName)
+                  <Button onClick={() => {
+                    setRoleLogSelected(record)
+                    setIsModalOpen(true)
                 }}>流水</Button>
         
                 <Button onClick={() => {
@@ -235,7 +126,9 @@ const Admin: React.FC = () => {
                       }
                     }
                   })
-                 }}>下架</Button>
+                    }}
+                    disabled={record.reviewStatus !== ReviewStatus.REVIEWED}
+                  >下架</Button>
                 <Button type='primary' disabled={record.reviewStatus !== ReviewStatus.WAIT_REVIEW}
                   onClick={async () => {
                     await approveReview(record.roleId)
