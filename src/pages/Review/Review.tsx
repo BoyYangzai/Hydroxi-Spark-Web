@@ -129,7 +129,7 @@ const Admin: React.FC = () => {
                     }}
                     disabled={record.reviewStatus !== ReviewStatus.REVIEWED}
                   >下架</Button>
-                <Button type='primary' disabled={record.reviewStatus !== ReviewStatus.WAIT_REVIEW}
+                <Button type='primary' disabled={record.reviewStatus === ReviewStatus.REVIEWED}
                   onClick={async () => {
                     await approveReview(record.roleId)
                     message.success('审核通过')
