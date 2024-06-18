@@ -235,17 +235,15 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       disabled
 
       required />
-   <ProFormTextArea
-      name="relationshipLabel"
-      label="Relationship label"
+        <ProFormTextArea
+      name="greeting"
+      label="Greeting"
       disabled
-
       required />
        <ProFormTextArea
       name="relationshipLabel"
       label="Relationship label"
       disabled
-
       required />
     
        <ProFormTextArea
