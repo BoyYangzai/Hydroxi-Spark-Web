@@ -256,3 +256,23 @@ export async function getCustomRoleLogByRoleId(data: {
     data
   });
 }
+
+
+export async function addCreator(data: {
+  "uid": string
+}) {
+  return request<Record<string, any>>('/api/admin/auth/addCreator', {
+    method: 'POST',
+    data
+  });
+}
+
+export async function addCoins(data: {
+  "uid": string,
+  "coins": number
+}) {
+  return request<Record<string, any>>('/api/admin/auth/addCoins', {
+    method: 'POST',
+    data
+  });
+}

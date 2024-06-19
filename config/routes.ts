@@ -71,6 +71,12 @@ export default [
     hideInMenu: true,
   },
   {
+    path: '/operation',
+    name: 'operation',
+    component: './Operation',
+    icon: 'control',
+  },
+  {
     path: '/',
     redirect: '/analysis/data_screen',
   },
