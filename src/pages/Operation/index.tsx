@@ -38,9 +38,13 @@ const EditRole: React.FC = () => {
       uid: string;
     }>
           onFinish={async (values) => {
-          await addCreator({
+          const res = await addCreator({
               uid: values.uid
           })
+            if (res.code === 500) {
+              message.success(res.message)
+              return;
+            }
             message.success('操作成功')
       }}
           params={{}}
@@ -66,10 +70,14 @@ const EditRole: React.FC = () => {
       coins: string;
     }>
           onFinish={async (values) => {
-          await addCoins({
+            const res= await addCoins({
               uid: values.uid,
               coins: Number(values.coins)
-          })
+            })
+            if (res.code === 500) {
+              message.success(res.message)
+              return;
+            }
             message.success('操作成功')
       }}
           params={{}}
