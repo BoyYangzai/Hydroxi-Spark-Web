@@ -42,7 +42,7 @@ const EditRole: React.FC = () => {
               uid: values.uid
           })
             if (res.code === 500) {
-              message.success(res.message)
+                     message.warning(res.message)
               return;
             }
             message.success('操作成功')
@@ -75,7 +75,7 @@ const EditRole: React.FC = () => {
               coins: Number(values.coins)
             })
             if (res.code === 500) {
-              message.success(res.message)
+              message.warning(res.message)
               return;
             }
             message.success('操作成功')
