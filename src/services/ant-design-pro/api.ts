@@ -276,3 +276,14 @@ export async function addCoins(data: {
     data
   });
 }
+
+export async function notification(data: {
+  "uids": string[] | undefined,
+  "title": string,
+  content: string
+}) {
+  return request<Record<string, any>>('/api/admin/message/push', {
+    method: 'POST',
+    data
+  });
+}

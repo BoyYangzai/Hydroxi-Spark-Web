@@ -2,7 +2,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
 import {  Button, Card, message } from 'antd';
 import React, { useEffect } from 'react';
-import { addCoins, addCreator, getRoleDetailById } from '@/services/ant-design-pro/api';
+import { addCoins, addCreator, getRoleDetailById, notification } from '@/services/ant-design-pro/api';
 import { ProForm, ProFormRadio, ProFormText,ProFormDigit } from '@ant-design/pro-components';
 
 const EditRole: React.FC = () => {
@@ -101,8 +101,57 @@ const EditRole: React.FC = () => {
              fieldProps={{ precision: 0 }}
       />
         </ProForm>
-        
-        
+      </Card>
+
+           <Card title='Notification' style={{
+          marginTop: 20
+        }}>
+        <ProForm<{
+      uids: string;
+      title: string;
+      content: string;
+    }>
+          onFinish={async (values) => {
+            const res= await notification({
+              uids:values.uids==='all'?undefined: values.uids.split(' '),
+              title: values.title,
+              content: values.content
+            })
+            if (res.code === 500) {
+              message.warning(res.message)
+              return;
+            }
+            message.success('操作成功')
+      }}
+          params={{}}
+    >
+    
+          
+  <ProFormText
+        width="md"
+        name="title"
+        label="通知标题"
+        tooltip="请谨慎操作"
+            placeholder="请输入标题"
+            rules={[{ required: true, message: '请输入标题' }]}
+          />
+            <ProFormText
+        width="md"
+        name="content"
+        label="通知内容"
+        tooltip="请谨慎操作"
+            placeholder="请输入内容"
+            rules={[{ required: true, message: '请输入内容' }]}
+          />
+            <ProFormText
+        width="md"
+        name="uids"
+        label="uids"
+        tooltip="请谨慎操作"
+        placeholder="请用空格分隔开多个 uid，全部用户请填写 all"
+        rules={[{ required: true, message: '请输入 uid' }]}
+          />
+        </ProForm>
       </Card>
     </PageContainer>
   );
