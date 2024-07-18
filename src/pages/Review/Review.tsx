@@ -32,7 +32,8 @@ const Admin: React.FC = () => {
   const [roleList, setRoleList] = React.useState<DataType[]>([]);
   const fetchData = async () => {
     const { data } = await getReviewList({ offset: mainTableCurrentOffset, limit: 10 });
-    setMainTotal(data.total);
+    console.log(data) 
+    setMainTotal(data.count);
     setRoleList(data.data);
   }
 
