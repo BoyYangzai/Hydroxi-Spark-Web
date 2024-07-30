@@ -77,6 +77,12 @@ export default [
     icon: 'control',
   },
   {
+    path: '/rag',
+    name: 'rag',
+    component: './Rag',
+    icon: 'tool',
+  },
+  {
     path: '/',
     redirect: '/analysis/data_screen',
   },

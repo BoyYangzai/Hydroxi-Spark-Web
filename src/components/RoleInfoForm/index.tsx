@@ -111,7 +111,6 @@ const RoleInfoFrom = ({ roleData }) => {
     setRoleShowsInfos(roleData?.roleShowInfos ?? [])
     setMaxRelationship(roleData?.maxIntimacyLevel)
   }, [roleData])
-  console.log(roleShowsInfos,'roleShowsInfos')
 
    const handleFormChange = (e) => {
       if (e.target.id === 'maxIntimacyLevel') {

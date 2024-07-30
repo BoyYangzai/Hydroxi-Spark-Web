@@ -287,3 +287,25 @@ export async function notification(data: {
     data
   });
 }
+
+// 知识库
+export async function getKnowledgeList() {
+  return request<Record<string, any>>('/api/admin/knowledge/list', {
+    method: 'POST',
+    data: {
+      limit: 1000,
+      offset: 0
+    }
+  });
+}
+
+
+export async function createKnowledge(file: File) {
+  console.log(file, 'upload file')
+  return request<Record<string, any>>('/api/admin/knowledge/create', {
+    method: 'POST',
+    data: {
+      file
+    }
+  });
+}

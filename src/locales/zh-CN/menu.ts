@@ -9,6 +9,7 @@ export default {
   'menu.edit': '角色管理平台',
   'menu.review': '角色审核管理',
   "menu.operation": "操作平台",
+  "menu.rag": "Rag后台",
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.register-result': '注册结果',
