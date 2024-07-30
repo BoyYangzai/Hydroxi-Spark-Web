@@ -301,11 +301,33 @@ export async function getKnowledgeList() {
 
 
 export async function createKnowledge(file: File) {
-  console.log(file, 'upload file')
+  const formData = new FormData();
+  formData.append('file', file);
+  console.log(file, 'upload file');
   return request<Record<string, any>>('/api/admin/knowledge/create', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data', // Ensure correct content type
+    },
+    data: formData,
+  });
+}
+
+export async function deleteKnowledge(id: number) {
+  return request<Record<string, any>>('/api/admin/knowledge/delete', {
+    method: 'POST',
     data: {
-      file
+      id
     }
+  });
+}
+
+export async function bindKnowledge(data: {
+  roleId: number,
+  knowledgeId: number
+}) {
+  return request<Record<string, any>>('/api/admin/knowledge/binding', {
+    method: 'POST',
+    data
   });
 }

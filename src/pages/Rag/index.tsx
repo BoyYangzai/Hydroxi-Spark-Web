@@ -2,7 +2,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import {  useIntl } from '@umijs/max';
 import {  Card, Upload, UploadProps, message } from 'antd';
 import React, { useEffect } from 'react';
-import { addCoins, addCreator, createKnowledge, getKnowledgeList, getRoleDetailById } from '@/services/ant-design-pro/api';
+import { addCoins, addCreator, bindKnowledge, createKnowledge, deleteKnowledge, getKnowledgeList, getRoleDetailById } from '@/services/ant-design-pro/api';
 import { ProForm, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { InboxOutlined } from '@ant-design/icons';
 import { FileType } from '../Review/DetailForm';
@@ -20,7 +20,7 @@ const EditRole: React.FC = () => {
 
   const init = async () => {
     const { data } = await getKnowledgeList()
-    setKnowledge(data.data)
+    setKnowledge(data.data??[])
   }
 
   useEffect(() => {
@@ -46,14 +46,23 @@ beforeUpload:(file: FileType) => {
   multiple: true,
     customRequest: async (data) => {
       console.log(data)
+      setKnowledge([
+        ...knowledge,
+        {
+          name: data?.file?.name,
+          status:'uploading'
+        }
+      ])
       await createKnowledge(data.file)
+      message.success('上传成功')
+      await init()
       return true
     },
     fileList: knowledge?.map((item) => {
       return {
-        uid: '1',
-        name: item.name,
         status: 'done',
+        ...item,
+        name: item.name,
       }
     }),
   onChange(info) {
@@ -66,9 +75,12 @@ beforeUpload:(file: FileType) => {
     } else if (status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
+    },
+    async onRemove(e) {
+      console.log(e)
+      await deleteKnowledge(Number(e.id))
+      message.success('删除知识库成功')
+      await init()
   },
 };
   return (
@@ -76,14 +88,16 @@ beforeUpload:(file: FileType) => {
       content={intl.formatMessage({
         id: '知识库挂靠角色、知识库文件上传',
       })}
+      
     >
       <Card title='知识库挂靠角色'>
         <ProForm<{
-      uid: string;
+      roleId: string;
     }>
           onFinish={async (values) => {
-          const res = await addCreator({
-              uid: values.uid
+          const res = await bindKnowledge({
+            roleId: Number(values.roleId),
+            knowledgeId:Number(values.knowledgeId)
           })
             if (res.code === 500) {
                      message.warning(res.message)
@@ -104,13 +118,15 @@ beforeUpload:(file: FileType) => {
           />
           
              <ProFormSelect
-          name="target"
+          name="knowledgeId"
           width="md"
           label={'选择知识库'}
-          valueEnum={{
-            0: '表一',
-            1: '表二',
-          }}
+            options={knowledge.map(i => {
+              return {
+                label: i.name,
+                value:i.id
+            }
+          })}
             required
         />
         </ProForm>
@@ -127,17 +143,22 @@ beforeUpload:(file: FileType) => {
       uid: string;
       coins: string;
     }>
-          onFinish={async (values) => {
-            const res= await addCoins({
-              uid: values.uid,
-              coins: Number(values.coins)
-            })
-            if (res.code === 500) {
-              message.warning(res.message)
-              return;
+      //     onFinish={async (values) => {
+      //       const res= await addCoins({
+      //         uid: values.uid,
+      //         coins: Number(values.coins)
+      //       })
+      //       if (res.code === 500) {
+      //         message.warning(res.message)
+      //         return;
+      //       }
+      //       message.success('操作成功')
+          // }}
+          submitter={
+            {
+             render:()=>null
             }
-            message.success('操作成功')
-      }}
+          }
           params={{}}
     >
   <Dragger {...props}>
