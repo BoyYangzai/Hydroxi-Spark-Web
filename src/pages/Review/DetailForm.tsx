@@ -250,7 +250,14 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       name="ourStory"
       label="Our story"
       disabled
+        required />
+      
+         <ProFormTextArea
+      name="roleDescription"
+      label="Role description"
+      disabled
       required />
+    
     
     <div style={{
       width: '100%',
