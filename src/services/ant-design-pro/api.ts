@@ -217,11 +217,12 @@ export async function getReviewList(options?: { [key: string]: any }) {
 }
 
 
-export async function approveReview(roleId: string) {
+export async function approveReview(roleId: string, lang: string[]) {
   return request<Record<string, any>>('/api/admin/review/approve', {
     method: 'POST',
     data: {
-      roleId
+      roleId,
+      lang
     },
   });
 }

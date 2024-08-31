@@ -1,7 +1,7 @@
 import { CheckCircleOutlined, CloseCircleOutlined, HeartTwoTone, SmileFilled, SmileTwoTone, WarningOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
-import { Button, Card, Modal, message } from 'antd';
+import { Button, Card, Modal, Select, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Table, Tag } from 'antd';
 import { approveReview, deListReview, getCustomRoleLogByRoleId, getReviewList } from '@/services/ant-design-pro/api';
@@ -19,7 +19,8 @@ interface DataType {
   roleName: string;
   roleId: string;
   createUid: string;
-  reviewStatus: ReviewStatus
+  reviewStatus: ReviewStatus;
+  lang: string[];
 }
 
 
@@ -45,6 +46,20 @@ const Admin: React.FC = () => {
   // Log Modal
   const [roleLogSelected, setRoleLogSelected] = useState<DataType>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
+  const [zone, setZone] = useState<string[]>([])
+
+  const options = [
+  { value: 'en', label: '美国' },
+    { value: 'ja', label: '日本' },
+  ]
+  const handleChange = async () => {
+    await approveReview(roleLogSelected?.roleId ?? '', zone)
+    message.success('修改成功')
+    await fetchData()
+    setIsZoneModalOpen(false)
+
+};
   return (
     <PageContainer
       content={intl.formatMessage({
@@ -53,7 +68,24 @@ const Admin: React.FC = () => {
       })}
 >
 <Card>
-<BillList roleId={roleLogSelected?.roleId??''} roleName={roleLogSelected?.roleName??''} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
+        <BillList roleId={roleLogSelected?.roleId ?? ''} roleName={roleLogSelected?.roleName ?? ''} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+        <Modal open={isZoneModalOpen} title='地区选择' onCancel={() => {
+          setIsZoneModalOpen(false)
+        }}
+          onOk={handleChange}
+        >
+         <Select
+            mode="tags"
+            style={{ width: '100%' }}
+            placeholder="选择地区"
+            options={options}
+            defaultValue={zone}
+            onChange={(value) => {
+              setZone(value)
+            }}
+            
+          />
+        </Modal>
   <Table dataSource={roleList} pagination={{
           total: mainTotal,
          current: mainTableCurrentOffset===0?1:(mainTableCurrentOffset/10)+1,
@@ -93,7 +125,15 @@ const Admin: React.FC = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '10px'
-              }}>
+                }}>
+                  <Button
+                    disabled={record.reviewStatus !== ReviewStatus.REVIEWED}
+                    onClick={() => {
+                    setRoleLogSelected(record)
+                    setZone(record.lang)
+                      setIsZoneModalOpen(true)
+                      
+                  }}>{record.lang}</Button>
                   <Button onClick={() => {
                     setRoleLogSelected(record)
                     setIsModalOpen(true)
@@ -132,7 +172,7 @@ const Admin: React.FC = () => {
                   >下架</Button>
                 <Button type='primary' disabled={record.reviewStatus === ReviewStatus.REVIEWED}
                   onClick={async () => {
-                    await approveReview(record.roleId)
+                    await approveReview(record.roleId,record.lang)
                     message.success('审核通过')
                     fetchData()
                 }}

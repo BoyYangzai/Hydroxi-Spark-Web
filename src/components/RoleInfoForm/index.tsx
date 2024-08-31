@@ -146,6 +146,13 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
         }
       : null;
 
+  const langList = [{
+    value: 'en',
+    label: '美国'
+  }, {
+    value: 'ja',
+    label: '日本'
+  }]
   
   return<ProForm<{
       useMode?: string;
@@ -271,12 +278,20 @@ const LAYOUT_TYPE_HORIZONTAL = 'horizontal';
       label="InformationShow"
       required
     />
+      <ProFormSelect
+      required
+    name="lang"
+      mode='multiple'
+      label={`发布地区\n(可多选)`}
+    options={langList}
+    placeholder="Please select a Zone"
+  />
     <ProFormSelect
       required
     name="voice"
       label={`Voice\n（创建后不可编辑）`}
     options={voiceList}
-    placeholder="Please select a Voice"
+      placeholder="Please select a Voice"
   />
     <ProFormDigit
       name="payVal"
